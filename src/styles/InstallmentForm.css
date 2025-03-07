@@ -1,0 +1,7 @@
+.form-field {
+    margin-bottom: 1rem; /* Add margin-bottom */
+  }
+  
+  .form-field label {
+    display: block; /* Ensure label is on a new line */
+  }
