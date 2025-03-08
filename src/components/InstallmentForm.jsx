@@ -4,7 +4,7 @@ import { Row, Col } from "react-bootstrap";
 
 const InstallmentForm = ({ onChange }) => {
   return (
-    <Form onChange={onChange}>
+    <Form onValueChange={onChange}>
       <Row className="mb-3">
         <Col>
           <label>

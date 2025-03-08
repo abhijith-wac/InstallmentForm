@@ -13,8 +13,7 @@ const InstallmentManagement = () => {
     handleMerge,
     handleUnmerge,
     handleSplit,
-    // handleUnsplit,
-  } = useInstallments();
+    } = useInstallments();
 
   const previousValues = useRef({ amount: null, installmentCount: null });
 
@@ -40,6 +39,9 @@ const InstallmentManagement = () => {
     (installment) => installment.isChecked
   ).length;
 
+  const hasSplitInstallments = installments.some(inst => inst.isChecked && inst.id.toString().includes("."));
+
+
   return (
     <Container className="mt-4">
       <Row className="mb-4">
@@ -62,7 +64,7 @@ const InstallmentManagement = () => {
           <Button
             variant="primary"
             onClick={handleMerge}
-            disabled={selectedInstallmentsCount < 2}
+            disabled={selectedInstallmentsCount < 2 || hasSplitInstallments}
             className="me-2"
           >
             Merge
