@@ -12,6 +12,8 @@ const InstallmentManagement = () => {
     handleCheckboxChange,
     handleMerge,
     handleUnmerge,
+    handleSplit,
+    // handleUnsplit,
   } = useInstallments();
 
   const previousValues = useRef({ amount: null, installmentCount: null });
@@ -73,6 +75,22 @@ const InstallmentManagement = () => {
           >
             Unmerge
           </Button>
+          <Button
+            variant="primary"
+            onClick={handleSplit}
+            disabled={selectedInstallmentsCount < 1}
+            className="me-2"
+          >
+            Split
+          </Button>
+          {/* <Button
+            variant="primary"
+            onClick={handleUnsplit}
+            disabled={selectedInstallmentsCount < 1}
+            className="me-2"
+          >
+            Split
+          </Button> */}
         </Col>
       </Row>
     </Container>

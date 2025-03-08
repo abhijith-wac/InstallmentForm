@@ -12,19 +12,21 @@ const InstallmentTable = ({ installments = [], handleCheckboxChange }) => {
         </tr>
       </thead>
       <tbody>
-        {installments.map((installment) => (
-          <tr key={installment.id}>
-            <td>
-              <Form.Check
-                type="checkbox"
-                checked={installment.isChecked}
-                onChange={() => handleCheckboxChange(installment.id)}
-              />
-            </td>
-            <td>{installment.id}</td>
-            <td>{installment.amount.toFixed(2)}</td>
-          </tr>
-        ))}
+        {installments
+          .filter((installment) => installment.show) 
+          .map((installment) => (
+            <tr key={installment.id}>
+              <td>
+                <Form.Check
+                  type="checkbox"
+                  checked={installment.isChecked}
+                  onChange={() => handleCheckboxChange(installment.id)}
+                />
+              </td>
+              <td>{installment.id}</td>
+              <td>{installment.amount.toFixed(2)}</td>
+            </tr>
+          ))}
       </tbody>
     </Table>
   );
