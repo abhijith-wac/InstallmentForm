@@ -27,7 +27,6 @@ const InstallmentManagement = () => {
     ) {
       generateInstallments(parseFloat(amount), parseInt(installmentCount));
 
-      // Update previous values
       previousValues.current = { amount, installmentCount };
     }
     console.log(values);
