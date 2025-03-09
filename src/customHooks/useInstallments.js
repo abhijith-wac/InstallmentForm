@@ -40,33 +40,29 @@ const useInstallments = () => {
       return;
     }
   
-  
-    // Extract unique numeric IDs
     const uniqueIds = [
-      ...new Set(selectedInstallments.map(inst => inst.id.toString()))
-    ].sort((a, b) => Number(a) - Number(b));
+      ...new Set(selectedInstallments.flatMap(inst => 
+        typeof inst.id === "string" ? inst.id.split("-").map(Number) : [inst.id]
+      ))
+    ].sort((a, b) => a - b);
   
-    // Ensure selection is sequential
     for (let i = 1; i < uniqueIds.length; i++) {
-      if (Number(uniqueIds[i]) !== Number(uniqueIds[i - 1]) + 1) {
+      if (uniqueIds[i] !== uniqueIds[i - 1] + 1) {
         alert("Please select installments in sequential order.");
         return;
       }
     }
   
-    // Generate merged ID
     const mergedId = uniqueIds.join("-");
   
-    // Create new merged installment
     const mergedInstallment = {
       id: mergedId,
       amount: selectedInstallments.reduce((sum, inst) => sum + inst.amount, 0),
       isChecked: false, 
       show: true,
-      originalInstallments: selectedInstallments,
+      originalInstallments: selectedInstallments.flatMap(inst => inst.originalInstallments || [inst]), 
     };
   
-    // Store merge history
     setMergeHistory(prevHistory => [
       ...prevHistory,
       {
@@ -76,24 +72,19 @@ const useInstallments = () => {
       },
     ]);
   
-    // Hide merged installments & disable isChecked
     const updatedInstallments = installments.map(installment =>
       selectedInstallments.some(selected => selected.id === installment.id)
-        ? { ...installment, show: false, isChecked: false } // Hide & uncheck
+        ? { ...installment, show: false, isChecked: false } 
         : installment
     );
   
-    // Insert merged installment at the correct position
     const firstIndex = installments.findIndex(inst => inst.id === selectedInstallments[0].id);
     updatedInstallments.splice(firstIndex, 0, mergedInstallment);
   
-    // Update state
     setInstallments(updatedInstallments);
   };
   
-  
-  
-    
+
   
   const handleUnmerge = () => {
     const selectedMerged = installments.filter(inst => inst.isChecked && inst.id.includes('-'));
@@ -103,20 +94,18 @@ const useInstallments = () => {
     let updatedInstallments = [...installments];
   
     selectedMerged.forEach(mergedInst => {
-      const splitIds = mergedInst.id.split('-'); // Extract IDs from merged installment
-      const firstTwoIds = splitIds.slice(0, 2).join('-'); // Get first two digits as a merged reference
+      const splitIds = mergedInst.id.split('-'); 
+      const firstTwoIds = splitIds.slice(0, 2).join('-'); 
   
-      // Find all installments containing the firstTwoIds (e.g., 1-2 and 1-2-3)
       const toRemove = updatedInstallments.filter(inst => 
-        inst.id.includes(firstTwoIds) && inst.id.includes(mergedInst.id)
+        inst.id.includes(firstTwoIds)
       );
+      
   
-      // Remove the found merged installments from the array
       updatedInstallments = updatedInstallments.filter(inst => 
         !toRemove.some(removeInst => removeInst.id === inst.id)
       );
   
-      // Restore the original individual installments by setting `show: true`
       mergedInst.originalInstallments.forEach(original => {
         updatedInstallments = updatedInstallments.map(inst => 
           inst.id === original.id ? { ...inst, show: true } : inst
@@ -124,7 +113,6 @@ const useInstallments = () => {
       });
     });
   
-    // Update state
     setInstallments(updatedInstallments);
   };
 
@@ -132,20 +120,17 @@ const useInstallments = () => {
     const selectedInstallments = installments.filter(inst => inst.isChecked);
   
     if (selectedInstallments.length >= 1) {
-      // Prevent splitting an already split installment (IDs containing ".")
       if (selectedInstallments.some(inst => inst.id.includes("."))) {
         alert("An installment can only be split once. Further splitting is not allowed.");
         return;
       }
   
-      // Extract unique IDs from selected installments
       const uniqueIds = [
         ...new Set(
           selectedInstallments.flatMap(inst => inst.id.toString().split('-'))
         ),
-      ].sort((a, b) => Number(a) - Number(b)); // Ensure numeric sorting
+      ].sort((a, b) => Number(a) - Number(b)); 
   
-      // Check if the selection is sequential
       for (let i = 1; i < uniqueIds.length; i++) {
         if (Number(uniqueIds[i]) !== Number(uniqueIds[i - 1]) + 1) {
           alert("Please select installments in sequential order.");
@@ -153,7 +138,6 @@ const useInstallments = () => {
         }
       }
   
-      // Create split installments (only allow 2 parts)
       const splitInstallments = selectedInstallments.flatMap(inst => [
         {
           id: `${inst.id}.1`,
@@ -171,7 +155,6 @@ const useInstallments = () => {
         }
       ]);
   
-      // Store in split history
       setSplitHistory(prevHistory => [
         ...prevHistory,
         {
@@ -181,71 +164,48 @@ const useInstallments = () => {
         },
       ]);
   
-      // Hide split installments & disable isChecked
       const updatedInstallments = installments.map(installment =>
         selectedInstallments.some(selected => selected.id === installment.id)
-          ? { ...installment, show: false, isChecked: false } // Hide & uncheck
+          ? { ...installment, show: false, isChecked: false } 
           : installment
       );
   
-      // Find the position of the first selected installment
       const firstIndex = installments.findIndex(inst => inst.id === selectedInstallments[0].id);
   
-      // Insert split installments at the correct position
       updatedInstallments.splice(firstIndex, 0, ...splitInstallments);
   
-      // Update state with new order
       setInstallments(updatedInstallments);
     }
   };
 
   const handleUnsplit = () => {
-    const selectedInstallments = installments.filter(inst => inst.isChecked);
+    const selectedInstallments = installments.filter(inst => inst.isChecked && inst.id.includes("."));
+
   
-    if (selectedInstallments.length === 0) {
-      alert("Please select a split installment to unsplit.");
-      return;
-    }
-  
-    // Get unique base IDs (before ".") from selected split installments
     const baseIds = [
       ...new Set(selectedInstallments.map(inst => inst.id.split(".")[0]))
     ];
   
-    // Find all installments that match any base ID with a "."
     const installmentsToRemove = installments.filter(inst =>
       baseIds.some(baseId => inst.id.startsWith(`${baseId}.`))
     );
   
-    // Find the original installments that were hidden and need to be restored
-    const restoredInstallments = installments
-      .filter(inst => baseIds.includes(inst.id) && !inst.id.includes("."))
-      .map(inst => ({ ...inst, show: true, isChecked: false }));
   
-    // Remove split installments
     let updatedInstallments = installments.filter(
       inst => !installmentsToRemove.some(split => split.id === inst.id)
     );
+
+    const restoredInstallments = updatedInstallments.map(inst =>
+      baseIds.includes(inst.id) ? { ...inst, show: true } : inst
+  );
+    
+   
   
-    // Restore original installments at their correct position
-    baseIds.forEach(baseId => {
-      const originalIndex = installments.findIndex(inst => inst.id === baseId);
-      if (originalIndex !== -1) {
-        updatedInstallments = [
-          ...updatedInstallments.slice(0, originalIndex),
-          restoredInstallments.find(inst => inst.id === baseId),
-          ...updatedInstallments.slice(originalIndex)
-        ];
-      }
-    });
-  
-    // Remove corresponding split history entries
     const updatedSplitHistory = splitHistory.filter(
       entry => !baseIds.includes(entry.originalId)
     );
   
-    // Update state
-    setInstallments(updatedInstallments);
+    setInstallments(restoredInstallments);
     setSplitHistory(updatedSplitHistory);
   };
   
@@ -261,7 +221,7 @@ const useInstallments = () => {
     handleMerge,
     handleUnmerge,
     handleSplit,
-    // handleUnsplit,
+    handleUnsplit,
   };
 };
 
