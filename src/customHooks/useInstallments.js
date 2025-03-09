@@ -2,8 +2,6 @@ import { useState } from "react";
 
 const useInstallments = () => {
   const [installments, setInstallments] = useState([]);
-  const [mergeHistory, setMergeHistory] = useState([]);
-  const [splitHistory, setSplitHistory] = useState([]);
 
 
   const generateInstallments = (amount, installmentCount, dueDate) => {
@@ -63,14 +61,6 @@ const useInstallments = () => {
       originalInstallments: selectedInstallments.flatMap(inst => inst.originalInstallments || [inst]), 
     };
   
-    setMergeHistory(prevHistory => [
-      ...prevHistory,
-      {
-        mergedId: mergedInstallment.id,
-        originalInstallments: selectedInstallments,
-        mergedInstallment,
-      },
-    ]);
   
     const updatedInstallments = installments.map(installment =>
       selectedInstallments.some(selected => selected.id === installment.id)
@@ -155,14 +145,6 @@ const useInstallments = () => {
         }
       ]);
   
-      setSplitHistory(prevHistory => [
-        ...prevHistory,
-        {
-          originalIds: selectedInstallments.map(inst => inst.id),
-          splitInstallments: splitInstallments.map(s => s.id),
-          details: splitInstallments
-        },
-      ]);
   
       const updatedInstallments = installments.map(installment =>
         selectedInstallments.some(selected => selected.id === installment.id)
@@ -179,8 +161,9 @@ const useInstallments = () => {
   };
 
   const handleUnsplit = () => {
-    const selectedInstallments = installments.filter(inst => inst.isChecked && inst.id.includes("."));
-
+    const selectedInstallments = installments.filter(
+      inst => inst.isChecked && inst.id.includes(".")
+    );
   
     const baseIds = [
       ...new Set(selectedInstallments.map(inst => inst.id.split(".")[0]))
@@ -190,32 +173,27 @@ const useInstallments = () => {
       baseIds.some(baseId => inst.id.startsWith(`${baseId}.`))
     );
   
-  
     let updatedInstallments = installments.filter(
       inst => !installmentsToRemove.some(split => split.id === inst.id)
     );
-
+  
     const restoredInstallments = updatedInstallments.map(inst =>
       baseIds.includes(inst.id) ? { ...inst, show: true } : inst
-  );
-    
-   
-  
-    const updatedSplitHistory = splitHistory.filter(
-      entry => !baseIds.includes(entry.originalId)
     );
   
-    setInstallments(restoredInstallments);
-    setSplitHistory(updatedSplitHistory);
+    const sortedInstallments = restoredInstallments.sort((a, b) => {
+      return parseFloat(a.id) - parseFloat(b.id);
+    });
+  
+    setInstallments(sortedInstallments);
   };
+  
   
   
 
 
   return {
     installments,
-    mergeHistory,
-    splitHistory,
     generateInstallments,
     handleCheckboxChange,
     handleMerge,

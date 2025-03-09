@@ -7,7 +7,6 @@ import { Container, Button, Row, Col } from "react-bootstrap";
 const InstallmentManagement = () => {
   const {
     installments,
-    mergeHistory,
     generateInstallments,
     handleCheckboxChange,
     handleMerge,
@@ -40,11 +39,11 @@ const InstallmentManagement = () => {
     (installment) => installment.isChecked
   ).length;
 
+  const hasNoMergedInstallments = installments.some(inst => inst.isChecked && !inst.id.toString().includes("-"));
   const hasSplitInstallments = installments.some(inst => inst.isChecked && inst.id.toString().includes("."));
-  const hasNoSplitInstallments = installments.some(inst => 
-    inst.isChecked && !inst.id.toString().includes(".")
-);
+  const hasNoSplitInstallments = installments.some(inst => inst.isChecked && !inst.id.toString().includes("."));
 
+  console.log(hasSplitInstallments)
 
 
   return (
@@ -77,7 +76,7 @@ const InstallmentManagement = () => {
           <Button
             variant="secondary"
             onClick={handleUnmerge}
-            disabled={mergeHistory.length === 0}
+            disabled={selectedInstallmentsCount < 1  || hasNoMergedInstallments}
             className="me-2"
           >
             Unmerge
@@ -85,7 +84,7 @@ const InstallmentManagement = () => {
           <Button
             variant="primary"
             onClick={handleSplit}
-            disabled={selectedInstallmentsCount < 1}
+            disabled={selectedInstallmentsCount < 1 || hasSplitInstallments}
             className="me-2"
           >
             Split
