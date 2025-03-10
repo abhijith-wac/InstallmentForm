@@ -3,7 +3,6 @@ import { useState } from "react";
 const useInstallments = () => {
   const [installments, setInstallments] = useState([]);
 
-  
   //GenerateInstallments
   const generateInstallments = (amount, installmentCount) => {
     const baseAmount = Math.floor(amount / installmentCount);
@@ -22,7 +21,6 @@ const useInstallments = () => {
     setInstallments(newInstallments);
   };
 
-
   //handleCheckbox
   const handleCheckboxChange = (id) => {
     setInstallments((prevInstallments) =>
@@ -34,9 +32,9 @@ const useInstallments = () => {
     );
   };
 
-
   //handleDateChange
   const formatDate = (date) => date.toLocaleDateString("en-CA");
+
   const handleDateChange = (id, selectedDate) => {
     if (!selectedDate) return;
 
@@ -47,7 +45,6 @@ const useInstallments = () => {
       alert("Please select a future date (today or later).");
       return;
     }
-
     setInstallments((prevInstallments) => {
       const updatedInstallments = [...prevInstallments];
       const startIndex = updatedInstallments.findIndex(
@@ -56,24 +53,26 @@ const useInstallments = () => {
 
       if (startIndex !== -1) {
         updatedInstallments[startIndex].dueDate = formatDate(selectedDateObj);
-        const baseDay = selectedDateObj.getDate();
-        for (let i = startIndex + 1; i < updatedInstallments.length; i++) {
-          const prevDueDate = new Date(updatedInstallments[i - 1].dueDate);
-          if (isNaN(prevDueDate)) break;
-          const nextDueDate = new Date(prevDueDate);
-          nextDueDate.setMonth(nextDueDate.getMonth() + 1);
-          nextDueDate.setDate(baseDay);
-          if (nextDueDate.getMonth() !== (prevDueDate.getMonth() + 1) % 12) {
-            nextDueDate.setDate(0);
+        if (startIndex === 0) {
+          const baseDay = selectedDateObj.getDate();
+          for (let i = 1; i < updatedInstallments.length; i++) {
+            const prevDueDate = new Date(updatedInstallments[i - 1].dueDate);
+            if (isNaN(prevDueDate)) break;
+            const nextDueDate = new Date(prevDueDate);
+            nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+            nextDueDate.setDate(baseDay);
+
+            if (nextDueDate.getMonth() !== (prevDueDate.getMonth() + 1) % 12) {
+              nextDueDate.setDate(0);
+            }
+            updatedInstallments[i].dueDate = formatDate(nextDueDate);
           }
-          updatedInstallments[i].dueDate = formatDate(nextDueDate);
         }
       }
 
       return updatedInstallments;
     });
   };
-
 
   //handleMerge
   const handleMerge = () => {
@@ -129,8 +128,6 @@ const useInstallments = () => {
     setInstallments(updatedInstallments);
   };
 
-
-
   //handleUnmerge
   const handleUnmerge = () => {
     const selectedMerged = installments.filter(
@@ -162,7 +159,6 @@ const useInstallments = () => {
 
     setInstallments(updatedInstallments);
   };
-
 
   //handleSplit
   const handleSplit = () => {
@@ -243,7 +239,6 @@ const useInstallments = () => {
     }
   };
 
-
   //handleUnsplit
   const handleUnsplit = () => {
     const selectedInstallments = installments.filter(
@@ -262,9 +257,22 @@ const useInstallments = () => {
       (inst) => !installmentsToRemove.some((split) => split.id === inst.id)
     );
 
-    const restoredInstallments = updatedInstallments.map((inst) =>
-      baseIds.includes(inst.id) ? { ...inst, show: true } : inst
-    );
+    const restoredInstallments = updatedInstallments.map((inst) => {
+      if (baseIds.includes(inst.id)) {
+        const firstSplitInstallment = installments.find(
+          (split) => split.id === `${inst.id}.1`
+        );
+
+        return {
+          ...inst,
+          show: true,
+          dueDate: firstSplitInstallment
+            ? firstSplitInstallment.dueDate
+            : inst.dueDate,
+        };
+      }
+      return inst;
+    });
 
     const sortedInstallments = restoredInstallments.sort((a, b) => {
       return parseFloat(a.id) - parseFloat(b.id);
