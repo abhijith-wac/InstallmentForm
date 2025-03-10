@@ -2,9 +2,7 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Table } from "react-bootstrap";
-import '../styles/InstallmentTable.css'
-
-
+import "../styles/InstallmentTable.css";
 
 const InstallmentTable = ({
   installments = [],
@@ -58,7 +56,11 @@ const InstallmentTable = ({
                   }
                   dateFormat="dd-MMM-yyyy"
                   placeholderText="Select Due Date"
-                  className={`form-control ${index === 0 && !firstDueDateSelected ? "highlight-border" : ""}`}
+                  className={`form-control ${
+                    index === 0 && !firstDueDateSelected
+                      ? "highlight-border"
+                      : ""
+                  }`}
                   disabled={index !== 0 && !firstDueDateSelected}
                 />
               </td>
