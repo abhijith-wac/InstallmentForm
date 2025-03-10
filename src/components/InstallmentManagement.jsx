@@ -3,6 +3,7 @@ import useInstallments from "../customHooks/useInstallments";
 import InstallmentForm from "./InstallmentForm";
 import InstallmentTable from "./InstallmentTable";
 import { Container, Button, Row, Col } from "react-bootstrap";
+import { ToastContainer } from "react-toastify";
 
 const InstallmentManagement = () => {
   const {
@@ -49,6 +50,7 @@ const InstallmentManagement = () => {
 
   return (
     <Container className="mt-4">
+      <ToastContainer position="top-right" autoClose={3000} />
       <Row className="mb-4">
         <Col>
           <InstallmentForm onChange={handleFormChange} />

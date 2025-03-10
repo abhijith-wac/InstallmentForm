@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const useInstallments = () => {
   const [installments, setInstallments] = useState([]);
@@ -42,7 +43,7 @@ const useInstallments = () => {
     selectedDateObj.setHours(0, 0, 0, 0);
 
     if (selectedDateObj < new Date().setHours(0, 0, 0, 0)) {
-      alert("Please select a future date (today or later).");
+      toast.error("Please select a future date (today or later).");
       return;
     }
     setInstallments((prevInstallments) => {
@@ -78,7 +79,7 @@ const useInstallments = () => {
   const handleMerge = () => {
     const selectedInstallments = installments.filter((inst) => inst.isChecked);
     if (selectedInstallments.length < 2) {
-      alert("Please select at least two installments to merge.");
+      toast.error("Please select at least two installments to merge.");
       return;
     }
     const uniqueIds = [
@@ -92,7 +93,7 @@ const useInstallments = () => {
     ].sort((a, b) => a - b);
     for (let i = 1; i < uniqueIds.length; i++) {
       if (uniqueIds[i] !== uniqueIds[i - 1] + 1) {
-        alert("Please select installments in sequential order.");
+        toast.error("Please select installments in sequential order.");
         return;
       }
     }
@@ -166,9 +167,7 @@ const useInstallments = () => {
 
     if (selectedInstallments.length >= 1) {
       if (selectedInstallments.some((inst) => inst.id.includes("."))) {
-        alert(
-          "An installment can only be split once. Further splitting is not allowed."
-        );
+        toast.error("An installment can only be split once. Further splitting is not allowed.");
         return;
       }
 
@@ -180,7 +179,7 @@ const useInstallments = () => {
 
       for (let i = 1; i < uniqueIds.length; i++) {
         if (Number(uniqueIds[i]) !== Number(uniqueIds[i - 1]) + 1) {
-          alert("Please select installments in sequential order.");
+          toast.error("Please select installments in sequential order.");
           return;
         }
       }
