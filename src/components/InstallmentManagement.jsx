@@ -9,41 +9,43 @@ const InstallmentManagement = () => {
     installments,
     generateInstallments,
     handleCheckboxChange,
+    handleDateChange,
     handleMerge,
     handleUnmerge,
     handleSplit,
     handleUnsplit,
-    } = useInstallments();
+  } = useInstallments();
 
   const previousValues = useRef({ amount: null, installmentCount: null });
 
   const handleFormChange = ({ values }) => {
     const { amount, installmentCount } = values;
-
     if (
       amount &&
       installmentCount &&
-      (previousValues.current.amount !== amount || previousValues.current.installmentCount !== installmentCount)
+      (previousValues.current.amount !== amount ||
+        previousValues.current.installmentCount !== installmentCount)
     ) {
       generateInstallments(parseFloat(amount), parseInt(installmentCount));
-
       previousValues.current = { amount, installmentCount };
     }
-    console.log(values);
   };
 
-  console.log(installments)
+  console.log(installments);
 
   const selectedInstallmentsCount = installments.filter(
     (installment) => installment.isChecked
   ).length;
 
-  const hasNoMergedInstallments = installments.some(inst => inst.isChecked && !inst.id.toString().includes("-"));
-  const hasSplitInstallments = installments.some(inst => inst.isChecked && inst.id.toString().includes("."));
-  const hasNoSplitInstallments = installments.some(inst => inst.isChecked && !inst.id.toString().includes("."));
-
-  console.log(hasSplitInstallments)
-
+  const hasNoMergedInstallments = installments.some(
+    (inst) => inst.isChecked && !inst.id.toString().includes("-")
+  );
+  const hasSplitInstallments = installments.some(
+    (inst) => inst.isChecked && inst.id.toString().includes(".")
+  );
+  const hasNoSplitInstallments = installments.some(
+    (inst) => inst.isChecked && !inst.id.toString().includes(".")
+  );
 
   return (
     <Container className="mt-4">
@@ -58,6 +60,7 @@ const InstallmentManagement = () => {
           <InstallmentTable
             installments={installments}
             handleCheckboxChange={handleCheckboxChange}
+            handleDateChange={handleDateChange}
           />
         </Col>
       </Row>
@@ -75,7 +78,7 @@ const InstallmentManagement = () => {
           <Button
             variant="secondary"
             onClick={handleUnmerge}
-            disabled={selectedInstallmentsCount < 1  || hasNoMergedInstallments}
+            disabled={selectedInstallmentsCount < 1 || hasNoMergedInstallments}
             className="me-2"
           >
             Unmerge

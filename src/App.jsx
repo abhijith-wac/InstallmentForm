@@ -1,11 +1,13 @@
-import React from 'react'
+import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import InstallmentManagement from './components/InstallmentManagement'
+import InstallmentManagement from "./components/InstallmentManagement";
 
 const App = () => {
   return (
-    <div><InstallmentManagement /></div>
-  )
-}
+    <div>
+      <InstallmentManagement />
+    </div>
+  );
+};
 
-export default App
+export default App;
