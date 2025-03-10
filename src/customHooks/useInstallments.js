@@ -5,7 +5,7 @@ const useInstallments = () => {
 
   
   //GenerateInstallments
-  const generateInstallments = (amount, installmentCount, dueDate) => {
+  const generateInstallments = (amount, installmentCount) => {
     const baseAmount = Math.floor(amount / installmentCount);
     const remainder = amount % installmentCount;
     const newInstallments = Array.from(
