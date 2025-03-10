@@ -2,7 +2,7 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Table } from "react-bootstrap";
-import './styles/InstallmentTable.css'
+import '../styles/InstallmentTable.css'
 
 
 

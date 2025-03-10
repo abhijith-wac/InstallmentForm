@@ -40,7 +40,7 @@ const InstallmentForm = ({ onChange }) => {
             Installment Count:
             <Select
               name="installmentCount"
-              initialValue="8"
+              initialValue="1"
               className="form-control"
             >
               {[...Array(12)].map((_, i) => (
