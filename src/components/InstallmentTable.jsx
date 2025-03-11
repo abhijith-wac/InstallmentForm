@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Table } from "react-bootstrap";
 import "../styles/InstallmentTable.css";
+import { getMinMaxDate } from "../utils/getMinMaxDate";
 
 const InstallmentTable = ({
   installments = [],
@@ -44,16 +45,8 @@ const InstallmentTable = ({
                     installment.dueDate ? new Date(installment.dueDate) : null
                   }
                   onChange={(date) => handleDateChange(installment.id, date)}
-                  minDate={
-                    installment.dueDateRange?.min
-                      ? new Date(installment.dueDateRange.min)
-                      : new Date()
-                  }
-                  maxDate={
-                    installment.dueDateRange?.max
-                      ? new Date(installment.dueDateRange.max)
-                      : undefined
-                  }
+                  minDate={getMinMaxDate(installments, installment.id).minDate}
+                  maxDate={getMinMaxDate(installments, installment.id).maxDate}
                   dateFormat="dd-MMM-yyyy"
                   placeholderText="Select Due Date"
                   className={`form-control ${

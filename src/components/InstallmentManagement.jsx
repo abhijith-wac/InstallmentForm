@@ -10,11 +10,11 @@ const InstallmentManagement = () => {
     installments,
     generateInstallments,
     handleCheckboxChange,
-    handleDateChange,
     handleMerge,
     handleUnmerge,
     handleSplit,
     handleUnsplit,
+    handleDateChange,
   } = useInstallments();
 
   const previousValues = useRef({ amount: null, installmentCount: null });
